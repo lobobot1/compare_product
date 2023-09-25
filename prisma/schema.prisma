@@ -106,6 +106,36 @@ model ljacquardo{
   Designation_VP              String? @db.VarChar(200)
 }
 
+model ljacquards {
+  id_origin                 Int 
+  id_similar              	Int @id @default(autoincrement())
+  status	                  Int
+  request_payload	          String? @db.VarChar(1200)
+  url	                      String? @db.VarChar(1200)
+  name	                    String? @db.VarChar(1200)
+  collection	              String? @db.VarChar(1200)
+  website_sku	              String? @db.VarChar(1200)
+  color	                    String? @db.VarChar(1200)
+  pictures_url	            String? @db.VarChar(1200)
+  exit_code	                Int
+  netprice_sku	            Float
+  brutprice_sku	            Float
+  discount	                Float
+  delivery_time	            String? @db.VarChar(1200)
+  extra_jump_index	        Int
+  shipping_fees	            Float
+  seller_name	              String? @db.VarChar(1200)
+  prices_currency	          String? @db.VarChar(1200)
+  color_idx	                Int
+  size_idx	                Int
+  long_description_1	      String? @db.VarChar(5000)
+  brand	                    String? @db.VarChar(1200)
+  Type_of_product	          String? @db.VarChar(1200)
+  ean	                      String? @db.VarChar(1200)
+  dimensions	              String? @db.VarChar(1200)
+  composition               String? @db.VarChar(1200)
+}
+
 model lollipopo{
   id_origin	                                Int   @id @unique
   Company	                                  String? @db.VarChar(200)
