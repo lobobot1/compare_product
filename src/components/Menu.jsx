@@ -23,7 +23,7 @@ const Menu = () => {
     <div>
         <ul className="flex flex-col items-center text-left gap-3 pt-12 px-5">
             {product_type.map((product) => (
-              <li key={product} className={`w-full text-2xl ${product===origin.slice(0,-1) ? 'text-[#2ed89a]' : 'text-[#cfd1d5]'}  font-semibold`}>
+              <li key={product} className={`w-full text-xl ${product===origin.slice(0,-1) ? 'text-[#2ed89a]' : 'text-[#cfd1d5]'}  font-semibold`}>
                   <button 
                     className="capitalize"
                     onClick={()=> handleClick(product)}>
