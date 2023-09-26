@@ -1,7 +1,10 @@
 "use client";
-import { getSimilar } from "../fetch/getSimilar";
+import { getSimilar, getTotalSimilar } from "../fetch/getSimilar";
+import { updateSimilar} from "../fetch/updateSimilar";
 import { getOrigin } from "../fetch/getOrigin";
-import { createContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect, useCallback } from "react";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const FetchingContext = createContext();
 
@@ -11,36 +14,55 @@ const FetchingProvider = ({ children }) => {
   const [similar, setSimilar] = useState("");
   const [similarData, setSimilarData] = useState({});
   const [originData, setOriginData] = useState({});
-  const [status, setStatus] = useState("default");
+  const [status, setStatus] = useState();
+  const [totalProducts, setTotalProducts] = useState(0);
 
   const getData = async (funct, table, otherOption) => {
-    let currentData = await funct(table, otherOption);
-    currentData.then((data) => {
+    const currentData = await funct(table, otherOption);
+    if(currentData.ok){
+      let data = await currentData.json();
       if (table.slice(-1) === "o") {
-        setOriginData(data);
+        setOriginData(data.data);
       } else {
-        setSimilarData(data);
+        setSimilarData(data.data);
+        setStatus(similarData.status);
       }
-    });
+    }
   };
+
+  const getTotal = useCallback( async () => {
+    const total = await getTotalSimilar(similar);
+    if(total.ok){
+      let data = await total.json();
+      setTotalProducts(data.data);
+    }
+  }, [similar])
+
+  const updateStatus = useCallback(async () => {
+     await updateSimilar(similarData.id_similar,status, similar);
+  },[similarData.id_similar, status, similar])
 
   useEffect(() => {
     const storedPagination = window.localStorage.getItem("pagination");
     const storedOrigin = window.localStorage.getItem("origin");
     const storedSimilar = window.localStorage.getItem("similar");
-    if (storedPagination && storedOrigin && storedSimilar) {
+    const storedTotalProducts = window.localStorage.getItem("totalProducts");
+    if (storedPagination && storedOrigin && storedSimilar && storedTotalProducts) {
       setPagination(parseInt(storedPagination));
       setOrigin(storedOrigin);
       setSimilar(storedSimilar);
+      setTotalProducts(parseInt(storedTotalProducts));
     }
   }, []);
 
   useEffect(() => {
+    getTotal();
     setPagination(1);
-  }, [origin, similar]);
+  }, [getTotal,origin, similar]);
   
   useEffect(() => {
     if (similar.length > 0) {
+      
       getData(getSimilar, similar, pagination);
     }
   }, [similar, pagination]);
@@ -49,7 +71,66 @@ const FetchingProvider = ({ children }) => {
     if (similarData.id_origin) {
       getData(getOrigin, origin, similarData.id_origin);
     }
-  }, [origin, similarData]);
+  }, [origin, similarData.id_origin]);
+  
+  useEffect(() => {
+    if(similarData.status!==undefined){
+      setStatus(similarData.status);
+    }
+  }, [similarData.status]);
+  
+  useEffect(() => {
+    if(similarData?.status!==undefined && Number.isFinite(status) && similarData.status !== status){
+      const updateData = async () => {
+        await updateStatus();
+        similarData.status = status;
+      }
+      updateData();
+      toast.info(`Status updated to ${status}`, {
+        position: "bottom-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: false,
+        progress: undefined,
+      });
+    }
+  }, [status]);
+
+  useEffect(() => {
+    const handleKeyPress = (event) => {
+      switch(event.key){
+        case 'ArrowLeft':
+          if(pagination > 1){
+            setPagination(pagination - 1);
+          }
+          break;
+        case 'ArrowRight':
+          if(pagination < totalProducts){
+            setPagination(pagination + 1);
+          }
+          break;
+          case 'y':
+          setStatus(1);
+          break;
+        case 'n':
+          setStatus(2);
+          break;
+        case 'r':
+          setStatus(0);
+          break;
+        default:
+          break;
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyPress);
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyPress);
+    };
+  },[pagination]);
 
   useEffect(() => {
     window.localStorage.setItem("pagination", pagination);
@@ -63,6 +144,10 @@ const FetchingProvider = ({ children }) => {
     window.localStorage.setItem("similar", similar);
   }, [similar]);
 
+  useEffect(() => {
+    window.localStorage.setItem("totalProducts", totalProducts);
+  },[totalProducts]);
+
   return (
     <FetchingContext.Provider
       value={{
@@ -74,9 +159,13 @@ const FetchingProvider = ({ children }) => {
         pagination,
         similarData,
         originData,
+        status,
+        setStatus,
+        totalProducts
       }}
     >
       {children}
+      <ToastContainer />
     </FetchingContext.Provider>
   );
 };
