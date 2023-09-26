@@ -7,3 +7,12 @@ export async function getSimilar(similars,pagination){
         }
 })
 }
+
+export async function getTotalSimilar(similars){
+    return await fetch(`http://localhost:3000/api/similars/total?similar=${similars}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+}
