@@ -16,6 +16,7 @@ const FetchingProvider = ({ children }) => {
   const [originData, setOriginData] = useState({});
   const [status, setStatus] = useState();
   const [totalProducts, setTotalProducts] = useState(0);
+  const [message, setMessage] = useState('Product still needs to be matched');
 
   const getData = async (funct, table, otherOption) => {
     const currentData = await funct(table, otherOption);
@@ -24,17 +25,21 @@ const FetchingProvider = ({ children }) => {
       if (table.slice(-1) === "o") {
         setOriginData(data.data);
       } else {
+        const currentStatus = data.data.status;
         setSimilarData(data.data);
-        setStatus(similarData.status);
+        setStatus(currentStatus);
+        setMessage(currentStatus === 0 ? 'Product still needs to be matched' : currentStatus === 1 ? 'Product Matched' : 'Product not matched');
       }
     }
   };
 
   const getTotal = useCallback( async () => {
-    const total = await getTotalSimilar(similar);
-    if(total.ok){
-      let data = await total.json();
-      setTotalProducts(data.data);
+    if(similar.length > 0){
+      const total = await getTotalSimilar(similar);
+      if(total.ok){
+        let data = await total.json();
+        setTotalProducts(data.data);
+      }
     }
   }, [similar])
 
@@ -62,15 +67,16 @@ const FetchingProvider = ({ children }) => {
   
   useEffect(() => {
     if (similar.length > 0) {
-      
       getData(getSimilar, similar, pagination);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [similar, pagination]);
 
   useEffect(() => {
     if (similarData.id_origin) {
       getData(getOrigin, origin, similarData.id_origin);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [origin, similarData.id_origin]);
   
   useEffect(() => {
@@ -95,7 +101,9 @@ const FetchingProvider = ({ children }) => {
         draggable: false,
         progress: undefined,
       });
+      setMessage(status === 0 ? 'Product still needs to be matched' : status === 1 ? 'Product Matched' : 'Product not matched');
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status]);
 
   useEffect(() => {
@@ -117,7 +125,7 @@ const FetchingProvider = ({ children }) => {
         case 'n':
           setStatus(2);
           break;
-        case 'r':
+        case 'p':
           setStatus(0);
           break;
         default:
@@ -125,12 +133,13 @@ const FetchingProvider = ({ children }) => {
       }
     };
 
-    document.addEventListener('keydown', handleKeyPress);
+    const listener = document.addEventListener('keydown', handleKeyPress);
 
     return () => {
-      document.removeEventListener('keydown', handleKeyPress);
-    };
-  },[pagination]);
+      document.removeEventListener('keydown', listener);
+    }
+
+  },['y','n','p','ArrowLeft','ArrowRight']);
 
   useEffect(() => {
     window.localStorage.setItem("pagination", pagination);
@@ -161,7 +170,8 @@ const FetchingProvider = ({ children }) => {
         originData,
         status,
         setStatus,
-        totalProducts
+        totalProducts,  
+        message
       }}
     >
       {children}
