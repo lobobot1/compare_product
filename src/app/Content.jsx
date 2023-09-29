@@ -12,21 +12,16 @@ const options = [
 
 
 const Content = () => {
-  const { origin, setStatus, status } = useFetching();
-
-  const statusM = status === 0 ? 'default' : status === 1 ? 'accept' : 'decline';
+  const { origin, setStatus, message } = useFetching();
 
   const obj = {
     accept: {
-      message: 'Product Matched',
       function: () => setStatus(1)
     },
     default: {
-      message: 'Product still needs to be matched',
       function: () => setStatus(0)
     },
     decline: {
-      message: 'Product not matched',
       function: () => setStatus(2)
     }
   }
@@ -53,14 +48,14 @@ const Content = () => {
           <div className=" bg-[#283350] rounded shadow-md h-[82vh] p-3">
             <div >
               <h3 className="flex justify-end text-xl text-[#cfd1d5] font-medium ">
-                Status: <span className={`font-normal ${obj[statusM].message === 'Product Matched' ? 'text-green-500' : obj[statusM].message === 'Product not matched' ? 'text-red-600' : 'text-blue-700' }`}>{obj[statusM].message }</span> 
+                Status: <span className={`font-normal pl-2 ${message === 'Product Matched' ? 'text-green-500' : message === 'Product not matched' ? 'text-red-600' : 'text-blue-700' }`}>{ message }</span> 
               </h3>
             </div>
             <div className="grid grid-cols-3 gap-2 mt-3 mb-5">
               {options.map((option) => (
                 <Button
                   key={option}
-                  message={obj[option].message}
+                  message={message}
                   type={option}
                   handleChange={obj[option].function}
                 />
