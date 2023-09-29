@@ -16,13 +16,16 @@ const Content = () => {
 
   const obj = {
     accept: {
-      function: () => setStatus(1)
+      function: () => setStatus(1),
+      message: 'Product Matched'
     },
     default: {
-      function: () => setStatus(0)
+      function: () => setStatus(0),
+      message: 'Product still needs to be matched'
     },
     decline: {
-      function: () => setStatus(2)
+      function: () => setStatus(2),
+      message: 'Product not matched'
     }
   }
 
@@ -55,7 +58,7 @@ const Content = () => {
               {options.map((option) => (
                 <Button
                   key={option}
-                  message={message}
+                  message={obj[option].message}
                   type={option}
                   handleChange={obj[option].function}
                 />
