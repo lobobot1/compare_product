@@ -3,13 +3,7 @@ import Button from "../components/Button";
 import Data from "../components/Data";
 import useFetching from "../hooks/useFetching";
 
-const options = [
-  'accept',
-  'default',
-  'decline'
-];
-
-
+const options = ["accept", "default", "decline"];
 
 const Content = () => {
   const { origin, setStatus, message } = useFetching();
@@ -17,17 +11,17 @@ const Content = () => {
   const obj = {
     accept: {
       function: () => setStatus(1),
-      message: 'Product Matched'
+      message: "Product Matched",
     },
     default: {
       function: () => setStatus(0),
-      message: 'Product still needs to be matched'
+      message: "Product still needs to be matched",
     },
     decline: {
       function: () => setStatus(2),
-      message: 'Product not matched'
-    }
-  }
+      message: "Product not matched",
+    },
+  };
 
   return (
     <div>
@@ -48,10 +42,21 @@ const Content = () => {
             {origin.slice(0, -1)}
           </h1>
 
-          <div className=" bg-[#283350] rounded shadow-md h-[82vh] p-3">
-            <div >
+          <div className=" bg-[#283350] rounded shadow-md p-3 relative">
+            <div>
               <h3 className="flex justify-end text-xl text-[#cfd1d5] font-medium ">
-                Status: <span className={`font-normal pl-2 ${message === 'Product Matched' ? 'text-green-500' : message === 'Product not matched' ? 'text-red-600' : 'text-blue-700' }`}>{ message }</span> 
+                Status:{" "}
+                <span
+                  className={`font-normal pl-2 ${
+                    message === "Product Matched"
+                      ? "text-green-500"
+                      : message === "Product not matched"
+                      ? "text-red-600"
+                      : "text-blue-700"
+                  }`}
+                >
+                  {message}
+                </span>
               </h3>
             </div>
             <div className="grid grid-cols-3 gap-2 mt-3 mb-5">
@@ -66,7 +71,6 @@ const Content = () => {
             </div>
 
             <Data />
-
           </div>
         </section>
       )}
