@@ -1,9 +1,9 @@
-'use client'
-import { useContext } from "react"
-import FetchingContext from "../context/FetchingProvider"
+"use client";
+import { useContext } from "react";
+import FetchingContext from "../context/FetchingProvider";
 
 const useFetching = () => {
-    return useContext(FetchingContext)
-}
+  return useContext(FetchingContext);
+};
 
-export default useFetching
+export default useFetching;

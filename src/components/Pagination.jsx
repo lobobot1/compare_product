@@ -26,7 +26,13 @@ const Pagination = ({
         </svg>
       </button>
       <span>
-        <select name="" id="" value={currentPage} className="bg-transparent appearance-none cursor-pointer underline" onChange={e => changePagination(Number(e.target.value))}>
+        <select
+          name=""
+          id=""
+          value={currentPage}
+          className="bg-transparent appearance-none cursor-pointer underline"
+          onChange={(e) => changePagination(Number(e.target.value))}
+        >
           {Array.from({ length: totalProducts }, (_, i) => (
             <option className="bg-[#202435]" value={i + 1} key={i + 1}>
               {i + 1}
