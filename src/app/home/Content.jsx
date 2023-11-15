@@ -1,7 +1,7 @@
 "use client";
-import Button from "../components/Button";
-import Data from "../components/Data";
-import useFetching from "../hooks/useFetching";
+import Button from "../../components/Button";
+import Data from "../../components/Data";
+import useFetching from "../../hooks/useFetching";
 
 const options = ["accept", "default", "decline"];
 
