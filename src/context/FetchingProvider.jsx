@@ -1,44 +1,29 @@
 "use client";
 import { updateSimilar } from "../fetch/updateSimilar";
-import { createContext, useState, useEffect, useCallback } from "react";
+import { createContext, useState, useEffect } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import isDeepEqual from "../app/utils/objectCompare";
 import useFetch from "../hooks/useFetch";
 import "react-toastify/dist/ReactToastify.css";
+//import { useSWRConfig } from "swr";
 
 const FetchingContext = createContext();
 
 const FetchingProvider = ({ children }) => {
-  const [pagination, setPagination] = useState(1);
+  //const { cache } = useSWRConfig();
+
   const [origin, setOrigin] = useState("");
-  const [similar, setSimilar] = useState(null);
+  const [pagination, setPagination] = useState(
+    Number( 1)
+  );
+  const [similar, setSimilar] = useState( null);
   const [similarData, setSimilarData] = useState({});
   const [originData, setOriginData] = useState({});
   const [status, setStatus] = useState();
-  const [totalProducts, setTotalProducts] = useState(0);
+  const [totalProducts, setTotalProducts] = useState(
+    Number( 0)
+  );
   const [message, setMessage] = useState("Product still needs to be matched");
-
-  const updateStatus = useCallback(async () => {
-    await updateSimilar(similarData.id_similar, status, similar);
-  }, [similarData.id_similar, status, similar]);
-
-  useEffect(() => {
-    const storedPagination = window.localStorage.getItem("pagination");
-    const storedOrigin = window.localStorage.getItem("origin");
-    const storedSimilar = window.localStorage.getItem("similar");
-    const storedTotalProducts = window.localStorage.getItem("totalProducts");
-    if (
-      storedPagination &&
-      storedOrigin &&
-      storedSimilar &&
-      storedTotalProducts
-    ) {
-      setPagination(parseInt(storedPagination));
-      setOrigin(storedOrigin);
-      setSimilar(storedSimilar);
-      setTotalProducts(parseInt(storedTotalProducts));
-    }
-  }, []);
 
   useEffect(() => {
     if (
@@ -47,7 +32,7 @@ const FetchingProvider = ({ children }) => {
       similarData.status !== status
     ) {
       const updateData = async () => {
-        await updateStatus();
+        await updateSimilar(similarData.id_similar, status, similar);
         similarData.status = status;
       };
       updateData();
@@ -71,33 +56,34 @@ const FetchingProvider = ({ children }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status]);
 
-  useEffect(() => {
-    window.localStorage.setItem("pagination", pagination);
+/*   useEffect(() => {
+    cache.set("pagination", pagination);
   }, [pagination]);
 
   useEffect(() => {
-    window.localStorage.setItem("origin", origin);
+    cache.set("origin", origin);
   }, [origin]);
 
   useEffect(() => {
-    window.localStorage.setItem("similar", similar);
+    cache.set("similar", similar);
   }, [similar]);
 
   useEffect(() => {
-    window.localStorage.setItem("totalProducts", totalProducts);
-  }, [totalProducts]);
+    cache.set("totalProducts", totalProducts);
+  }, [totalProducts]); */
 
   const resSimilar = useFetch(
     () =>
-      similar &&
+      !!similar &&
       `http://localhost:3000/api/similars?similar=${similar}&pagination=${pagination}`
   );
 
   if (
     !resSimilar.isError &&
     !resSimilar.isLoading &&
+    !resSimilar.data?.error &&
     resSimilar.data &&
-    resSimilar.data.data.id_similar !== similarData.id_similar
+    resSimilar.data.data?.id_similar !== similarData.id_similar
   ) {
     setSimilarData(resSimilar.data.data);
     setStatus(resSimilar.data.data.status);
@@ -112,7 +98,7 @@ const FetchingProvider = ({ children }) => {
 
   const resTotal = useFetch(
     () =>
-      similar && `http://localhost:3000/api/similars/total?similar=${similar}`
+      !!similar && `http://localhost:3000/api/similars/total?similar=${similar}`
   );
 
   if (
@@ -126,8 +112,8 @@ const FetchingProvider = ({ children }) => {
 
   const resOrigin = useFetch(
     () =>
-      origin &&
-      similarData.id_origin &&
+      !!origin &&
+      !!similarData.id_origin &&
       `http://localhost:3000/api/origins?origin=${origin}&id_origin=${similarData.id_origin}`
   );
 
@@ -139,6 +125,14 @@ const FetchingProvider = ({ children }) => {
   ) {
     setOriginData(resOrigin.data.data);
   }
+
+  /* if(!resOrigin.isError &&
+    resOrigin.isLoading && 
+    !resOrigin.data &&
+    !isLoading
+    ){
+      setIsLoading(true);
+    } */
 
   /* 
   
