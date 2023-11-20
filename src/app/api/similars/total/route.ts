@@ -7,7 +7,10 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
   if (!similar)
     return NextResponse.json({ error: "No similar provided" }, { status: 400 });
 
-  const total = await prisma[similar].count();
+  const total = await prisma[similar]?.count();
+
+  if (!total)
+    return NextResponse.json({ error: "Similar not found" }, { status: 404 });
 
   return NextResponse.json(
     {

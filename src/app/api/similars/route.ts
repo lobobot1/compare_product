@@ -32,6 +32,9 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 
   if (!value)
     return NextResponse.json({ error: "Similar not found" }, { status: 404 });
+  
+  if(!await prisma[similar])
+    return NextResponse.json({ error: "Similar not found" }, { status: 404 });
 
   const [similarData] = await prisma[similar].findMany({
     skip: pagination - 1,
