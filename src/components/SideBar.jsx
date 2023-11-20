@@ -1,4 +1,3 @@
-'use client'
 import Menu from "./Menu";
 import { FaSignOutAlt } from "react-icons/fa";
 import { signOut } from 'next-auth/react'
@@ -31,7 +30,7 @@ const SideBar = () => {
         </div>
 
         <button className="capitalize bg-red-700 font-bold py-1 text-[#cfd1d5]" onClick={()=>signOut()}>
-          sing out <FaSignOutAlt className="inline-block" />
+          sign out <FaSignOutAlt className="inline-block" />
         </button>
 
       </nav>
