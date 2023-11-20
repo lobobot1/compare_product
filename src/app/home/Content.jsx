@@ -25,7 +25,7 @@ const Content = () => {
 
   return (
     <div>
-      {origin === "" ? (
+      {!origin ? (
         <div>
           <h1 className="h-1/6 text-5xl mx-5 mt-5 mb-8 font-bold">Home</h1>
           <div className="h-5/6 w-full mx-auto mt-20 flex justify-center">
@@ -38,9 +38,15 @@ const Content = () => {
         </div>
       ) : (
         <section>
-          <h1 className="h-[6vh] capitalize text-5xl mx-5 mb-8 font-bold text-[#cfd1d5] select-none ">
-            {origin.slice(0, -1)}
-          </h1>
+          <div className="flex justify-between">
+            <h1 className="h-[6vh] capitalize text-5xl mx-5 mb-8 font-bold text-[#cfd1d5] select-none ">
+              {origin.slice(0, -1)}
+            </h1>
+            <h3 className="text-xl font-semibold text-white capitalize">
+              <span className="">User: </span>
+              {session?.user?.name}
+            </h3>
+          </div>
 
           <div className=" bg-[#283350] rounded shadow-md p-3 relative">
             <div>
