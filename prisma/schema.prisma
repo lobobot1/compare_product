@@ -150,6 +150,7 @@ model ljacquards {
   ean	                      String? @db.VarChar(1200)
   dimensions	              String? @db.VarChar(1200)
   composition               String? @db.VarChar(1200)
+  updated_at                DateTime @default(now())
 }
 
 model lollipopo{
