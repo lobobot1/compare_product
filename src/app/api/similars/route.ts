@@ -1,6 +1,12 @@
 import { prisma } from "../../../lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
+interface params {
+  similar: string;
+  status: number;
+  similarID: number;
+}
+
 const dictionarySimilar = {
   nikes: {
     Brand: true,
@@ -37,6 +43,36 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: "Similar not found" }, { status: 404 });
 
   const [similarData] = await prisma[similar].findMany({
+    where: {
+      OR:[
+        {
+          AND:[
+            {
+              status: {
+                gt: 0,
+              }
+            },
+            {
+              updated_at: {
+                gte: new Date(new Date().getDate()-1)
+              }
+            }
+          ]
+        },
+        {
+          AND:[
+            {
+              status: 0
+            },
+            {
+              updated_at: {
+                gte: new Date()
+              }
+            }
+          ]
+        }
+      ]
+    },
     skip: pagination - 1,
     take: 1,
     select: value,
@@ -61,17 +97,18 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 export async function PUT(req: NextRequest): Promise<NextResponse> {
   const body = await req.json();
 
-  const { similarID, status, similar } = body;
+  const { similarID, status, similar }:params = body;
 
   if (!similarID || !Number.isFinite(status) || !similar)
     return NextResponse.json({ error: "No similar provided" }, { status: 400 });
 
-  const updatedSimilar = await prisma[similar].update({
+  const updatedSimilar:Object = await prisma[similar].update({
     where: {
       id_similar: similarID,
     },
     data: {
       status: status,
+      updated_at: new Date(),
     },
   });
 

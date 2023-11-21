@@ -2,7 +2,7 @@ import { prisma } from "../../../../lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
-  const similar = req.nextUrl.searchParams.get("similar");
+  const similar:string = req.nextUrl.searchParams.get("similar");
 
   if (!similar)
     return NextResponse.json({ error: "No similar provided" }, { status: 400 });
