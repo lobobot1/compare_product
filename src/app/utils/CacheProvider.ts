@@ -1,14 +1,20 @@
 export default function localStorageProvider() {
-    const windowGlobal = typeof window !== 'undefined' && window;
-  const infoCache =
-  windowGlobal ? localStorage.getItem("app-cache") ?? "[]" : "[]";
-  const map = new Map(JSON.parse(infoCache));
+  let stored: string | null;
+  
+  const windowBool = typeof window !== 'undefined';
 
-  if (windowGlobal)
+  if(windowBool){
+    stored = localStorage.getItem("app-cache");
+  }
+
+  const map = new Map(JSON.parse(stored || "[]"));
+  
+  if(windowBool){
     window.addEventListener("beforeunload", () => {
       const appCache = JSON.stringify(Array.from(map.entries()));
       localStorage.setItem("app-cache", appCache);
     });
+  }
 
   return map;
 }
