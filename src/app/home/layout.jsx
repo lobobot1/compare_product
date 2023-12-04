@@ -6,7 +6,7 @@ import { FetchingProvider } from "../../context/FetchingProvider";
 
 const homeLayout = ({ children }) => {
   return (
-    <SWRConfig value={{ provider: CacheProvider }}>
+    <SWRConfig value={{ provider: () => CacheProvider() }}>
       <FetchingProvider>
         <div className="flex flex-row">
           <aside className="md:w-[14.6%]  min-h-screen">

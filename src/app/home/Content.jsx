@@ -2,12 +2,12 @@
 import Button from "../../components/Button";
 import Data from "../../components/Data";
 import useFetching from "../../hooks/useFetching";
-
+import { useSession } from "next-auth/react";
 const options = ["accept", "default", "decline"];
 
 const Content = () => {
   const { origin, setStatus, message } = useFetching();
-
+const { data: session } = useSession();
   const obj = {
     accept: {
       function: () => setStatus(1),
@@ -76,7 +76,7 @@ const Content = () => {
               ))}
             </div>
 
-            <Data />
+            <Data/>
           </div>
         </section>
       )}
