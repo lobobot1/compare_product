@@ -2,28 +2,32 @@
 import { updateSimilar } from "../fetch/updateSimilar";
 import { createContext, useState, useEffect } from "react";
 import { ToastContainer, toast } from "react-toastify";
-import isDeepEqual from "../app/utils/objectCompare";
 import useFetch from "../hooks/useFetch";
 import "react-toastify/dist/ReactToastify.css";
-//import { useSWRConfig } from "swr";
+import { useSWRConfig } from "swr";
 
 const FetchingContext = createContext();
 
 const FetchingProvider = ({ children }) => {
-  //const { cache } = useSWRConfig();
-
+  const { cache } = useSWRConfig();
   const [origin, setOrigin] = useState("");
-  const [pagination, setPagination] = useState(
-    Number( 1)
-  );
-  const [similar, setSimilar] = useState( null);
+  const [pagination, setPagination] = useState(1);
+  const [similar, setSimilar] = useState(null);
   const [similarData, setSimilarData] = useState({});
   const [originData, setOriginData] = useState({});
   const [status, setStatus] = useState();
-  const [totalProducts, setTotalProducts] = useState(
-    Number( 0)
-  );
+  const [totalProducts, setTotalProducts] = useState(0);
   const [message, setMessage] = useState("Product still needs to be matched");
+
+  useEffect(() => {
+    if(similar===null && cache.get("similar")){
+      setOrigin(cache.get("origin"));
+      setPagination(Number(cache.get("pagination")));
+      setSimilar(cache.get("similar"));
+      setTotalProducts(Number(cache.get("totalProducts")));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (
@@ -56,21 +60,25 @@ const FetchingProvider = ({ children }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status]);
 
-/*   useEffect(() => {
+  useEffect(() => {
     cache.set("pagination", pagination);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pagination]);
 
   useEffect(() => {
     cache.set("origin", origin);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [origin]);
 
   useEffect(() => {
     cache.set("similar", similar);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [similar]);
 
   useEffect(() => {
     cache.set("totalProducts", totalProducts);
-  }, [totalProducts]); */
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [totalProducts]);
 
   const resSimilar = useFetch(
     () =>
@@ -85,8 +93,10 @@ const FetchingProvider = ({ children }) => {
     resSimilar.data &&
     resSimilar.data.data?.id_similar !== similarData.id_similar
   ) {
-    setSimilarData(resSimilar.data.data);
-    setStatus(resSimilar.data.data.status);
+    const { origin, ...rest } = resSimilar.data.data;
+    setSimilarData(rest);
+    setStatus(rest.status);
+    setOriginData(origin)
     setMessage(
       resSimilar.data.data.status === 0
         ? "Product still needs to be matched"
@@ -105,38 +115,12 @@ const FetchingProvider = ({ children }) => {
     !resTotal.isError &&
     !resTotal.isLoading &&
     resTotal.data &&
+    !resTotal.data?.error &&
     resTotal.data.data !== totalProducts
-  ) {
+  ) 
     setTotalProducts(resTotal.data.data);
-  }
-
-  const resOrigin = useFetch(
-    () =>
-      !!origin &&
-      !!similarData.id_origin &&
-      `http://localhost:3000/api/origins?origin=${origin}&id_origin=${similarData.id_origin}`
-  );
-
-  if (
-    !resOrigin.isError &&
-    !resOrigin.isLoading &&
-    resOrigin.data &&
-    !isDeepEqual(resOrigin.data.data, originData)
-  ) {
-    setOriginData(resOrigin.data.data);
-  }
-
-  /* if(!resOrigin.isError &&
-    resOrigin.isLoading && 
-    !resOrigin.data &&
-    !isLoading
-    ){
-      setIsLoading(true);
-    } */
 
   /* 
-  
-  
 
   useEffect(() => {
     const handleKeyPress = (event) => {
