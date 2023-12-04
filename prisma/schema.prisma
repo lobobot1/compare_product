@@ -7,8 +7,24 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  USER
+  ADMIN
+}
+
+model user {
+  id        String   @id @default(uuid())
+  name      String
+  username  String   @unique
+  email     String   @unique
+  password  String
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model nikeo {
-  id_origin                Int    @id @unique
+  id_origin                Int     @id @unique
   SKU_fournisseur          String? @db.VarChar(700)
   SKU                      String? @db.VarChar(700)
   ID_Produit               String? @db.VarChar(120)
@@ -31,140 +47,142 @@ model nikeo {
   INPUT                    String? @db.VarChar(700)
 }
 
-model maisono{
-  id_origin	                      Int   @id @unique
-  EAN	                            String? @db.VarChar(200)
-  GENCOD_Lot	                    String? @db.VarChar(200)
-  Compte_fournisseur	            String? @db.VarChar(200)
-  Code_Stock_PIV	                String? @db.VarChar(200)  
-  Brand_to_integrate	            String? @db.VarChar(200)
-  Marque	                        String? @db.VarChar(200)
-  Typologie_de_lot	              String? @db.VarChar(200)
-  Type_de_lot	                    String? @db.VarChar(200)
-  Designation	                    String? @db.VarChar(200)
-  Designation_N_1	                String? @db.VarChar(200)
-  FamilyId_reprise	              String? @db.VarChar(200)
-  Code_OP_reprise_PREVIEW         String? @db.VarChar(200)	
-  FamilyId_reprise_PREVIEW 	      String? @db.VarChar(200)
-  DET_GEO	                        String? @db.VarChar(200)
-  ID_de_DUPLI_GEO	                String? @db.VarChar(200)
-  DET_FdP	                        String? @db.VarChar(200)
-  ID_de_DUPLI_FdP	                String? @db.VarChar(200)
-  DECOMPO	                        String? @db.VarChar(200)
-  Production	                    String? @db.VarChar(200)
-  Sommelier	                      String? @db.VarChar(200)
-  Equipe	                        String? @db.VarChar(200)
-  Secteur	                        String? @db.VarChar(200)
-  Rayon	                          String? @db.VarChar(200)
+model maisono {
+  id_origin                       Int     @id @unique
+  EAN                             String? @db.VarChar(200)
+  GENCOD_Lot                      String? @db.VarChar(200)
+  Compte_fournisseur              String? @db.VarChar(200)
+  Code_Stock_PIV                  String? @db.VarChar(200)
+  Brand_to_integrate              String? @db.VarChar(200)
+  Marque                          String? @db.VarChar(200)
+  Typologie_de_lot                String? @db.VarChar(200)
+  Type_de_lot                     String? @db.VarChar(200)
+  Designation                     String? @db.VarChar(200)
+  Designation_N_1                 String? @db.VarChar(200)
+  FamilyId_reprise                String? @db.VarChar(200)
+  Code_OP_reprise_PREVIEW         String? @db.VarChar(200)
+  FamilyId_reprise_PREVIEW        String? @db.VarChar(200)
+  DET_GEO                         String? @db.VarChar(200)
+  ID_de_DUPLI_GEO                 String? @db.VarChar(200)
+  DET_FdP                         String? @db.VarChar(200)
+  ID_de_DUPLI_FdP                 String? @db.VarChar(200)
+  DECOMPO                         String? @db.VarChar(200)
+  Production                      String? @db.VarChar(200)
+  Sommelier                       String? @db.VarChar(200)
+  Equipe                          String? @db.VarChar(200)
+  Secteur                         String? @db.VarChar(200)
+  Rayon                           String? @db.VarChar(200)
   Famille                         String? @db.VarChar(200)
-  NGP_Nom_Generique_Produit	      String? @db.VarChar(200)
-  Statut_fiscal	                  String? @db.VarChar(200)
-  Presence_CRD_sur_les_bouteilles String? @db.VarChar(200)	
-  Nomenclature_Douaniere          String? @db.VarChar(200)	
-  Area	                          String? @db.VarChar(200)
-  Appellation	                    String? @db.VarChar(200)
-  Categorie_Alcool                String? @db.VarChar(200)	
-  Degree_of_alcohol               String? @db.VarChar(200)	
-  Color	                          String? @db.VarChar(200)
-  Capacity_volume	                String? @db.VarChar(200)
+  NGP_Nom_Generique_Produit       String? @db.VarChar(200)
+  Statut_fiscal                   String? @db.VarChar(200)
+  Presence_CRD_sur_les_bouteilles String? @db.VarChar(200)
+  Nomenclature_Douaniere          String? @db.VarChar(200)
+  Area                            String? @db.VarChar(200)
+  Appellation                     String? @db.VarChar(200)
+  Categorie_Alcool                String? @db.VarChar(200)
+  Degree_of_alcohol               String? @db.VarChar(200)
+  Color                           String? @db.VarChar(200)
+  Capacity_volume                 String? @db.VarChar(200)
   Vintage_year                    String? @db.VarChar(200)
 }
 
-model giottoo{
-  id_origin	        Int   @id @unique
-  BRAND	            String? @db.VarChar(200)
-  REFERENCE	        String? @db.VarChar(200)
-  EAN_UNITAIRE	    String? @db.VarChar(200)
-  DESIGNATION	      String? @db.VarChar(200)
-  PRICE_RRP         String? @db.VarChar(200)
+model giottoo {
+  id_origin    Int     @id @unique
+  BRAND        String? @db.VarChar(200)
+  REFERENCE    String? @db.VarChar(200)
+  EAN_UNITAIRE String? @db.VarChar(200)
+  DESIGNATION  String? @db.VarChar(200)
+  PRICE_RRP    String? @db.VarChar(200)
 }
 
-model ljacquardo{
-  id_origin	                  Int   @id @unique
-  index	                      Int
-  Product_ID                  String? @db.VarChar(120)	
-  Family_ID	                  String? @db.VarChar(120)
-  Reference	                  String? @db.VarChar(700)
-  Commercial_country	        String? @db.VarChar(20)
-  Supplier_account            String? @db.VarChar(120)	
-  Brand	                      String? @db.VarChar(350)
-  Stock_code	                String? @db.VarChar(120)
-  Type_of_product	            String? @db.VarChar(350)
-  Reference_VP	              String? @db.VarChar(120)
-  EAN 	                      String? @db.VarChar(350)
-  Brand_designation	          String? @db.VarChar(600)
-  Color	                      String? @db.VarChar(70)
-  Collection	                String? @db.VarChar(150)
-  Dimensions	                String? @db.VarChar(150)
-  Category	                  String? @db.VarChar(150)
-  Sub_Category	              String? @db.VarChar(300)            
-  NGP	                        String? @db.VarChar(200)
-  Year_of_reference	          String? @db.VarChar(200)
-  Composition	                String? @db.VarChar(200)
-  Grammage	                  String? @db.VarChar(200)
-  Washing_machine_conditions	String? @db.VarChar(200)
-  Designation_VP              String? @db.VarChar(200)
+model ljacquardo {
+  id_origin                  Int          @id @unique
+  index                      Int
+  Product_ID                 String?      @db.VarChar(120)
+  Family_ID                  String?      @db.VarChar(120)
+  Reference                  String?      @db.VarChar(700)
+  Commercial_country         String?      @db.VarChar(20)
+  Supplier_account           String?      @db.VarChar(120)
+  Brand                      String?      @db.VarChar(350)
+  Stock_code                 String?      @db.VarChar(120)
+  Type_of_product            String?      @db.VarChar(350)
+  Reference_VP               String?      @db.VarChar(120)
+  EAN                        String?      @db.VarChar(350)
+  Brand_designation          String?      @db.VarChar(600)
+  Color                      String?      @db.VarChar(70)
+  Collection                 String?      @db.VarChar(150)
+  Dimensions                 String?      @db.VarChar(150)
+  Category                   String?      @db.VarChar(150)
+  Sub_Category               String?      @db.VarChar(300)
+  NGP                        String?      @db.VarChar(200)
+  Year_of_reference          String?      @db.VarChar(200)
+  Composition                String?      @db.VarChar(200)
+  Grammage                   String?      @db.VarChar(200)
+  Washing_machine_conditions String?      @db.VarChar(200)
+  Designation_VP             String?      @db.VarChar(200)
+  ljacquards                 ljacquards[]
 }
 
 model ljacquards {
-  id_origin                 Int 
-  id_similar              	Int @id @default(autoincrement())
-  status	                  Int
-  request_payload	          String? @db.VarChar(1200)
-  url	                      String? @db.VarChar(1200)
-  name	                    String? @db.VarChar(1200)
-  collection	              String? @db.VarChar(1200)
-  website_sku	              String? @db.VarChar(1200)
-  color	                    String? @db.VarChar(1200)
-  pictures_url	            String? @db.VarChar(1200)
-  exit_code	                Int
-  netprice_sku	            Float
-  brutprice_sku	            Float
-  discount	                Float
-  delivery_time	            String? @db.VarChar(1200)
-  extra_jump_index	        Int
-  shipping_fees	            Float
-  seller_name	              String? @db.VarChar(1200)
-  prices_currency	          String? @db.VarChar(1200)
-  color_idx	                Int
-  size_idx	                Int
-  long_description_1	      String? @db.VarChar(5000)
-  brand	                    String? @db.VarChar(1200)
-  Type_of_product	          String? @db.VarChar(1200)
-  ean	                      String? @db.VarChar(1200)
-  dimensions	              String? @db.VarChar(1200)
-  composition               String? @db.VarChar(1200)
+  id_origin          Int
+  id_similar         Int        @id @default(autoincrement())
+  status             Int
+  request_payload    String?    @db.VarChar(1200)
+  url                String?    @db.VarChar(1200)
+  name               String?    @db.VarChar(1200)
+  collection         String?    @db.VarChar(1200)
+  website_sku        String?    @db.VarChar(1200)
+  color              String?    @db.VarChar(1200)
+  pictures_url       String?    @db.VarChar(1200)
+  exit_code          Int
+  netprice_sku       Float
+  brutprice_sku      Float
+  discount           Float
+  delivery_time      String?    @db.VarChar(1200)
+  extra_jump_index   Int
+  shipping_fees      Float
+  seller_name        String?    @db.VarChar(1200)
+  prices_currency    String?    @db.VarChar(1200)
+  color_idx          Int
+  size_idx           Int
+  long_description_1 String?    @db.VarChar(5000)
+  brand              String?    @db.VarChar(1200)
+  Type_of_product    String?    @db.VarChar(1200)
+  ean                String?    @db.VarChar(1200)
+  dimensions         String?    @db.VarChar(1200)
+  composition        String?    @db.VarChar(1200)
+  updated_at         DateTime   @default(now())
+  ljacquardo         ljacquardo @relation(fields: [id_origin], references: [id_origin])
 }
 
-model lollipopo{
-  id_origin	                                Int   @id @unique
-  Company	                                  String? @db.VarChar(200)
-  Brand                                     String? @db.VarChar(200)	
-  Storage_conditions                        String? @db.VarChar(200)
-	Reference_FNR_or_product_code             String? @db.VarChar(200)	
-  EAN_UC	                                  String? @db.VarChar(200)
-  Denomination_commerciale_UC               String? @db.VarChar(200)	
-  Weight_net_kg_ou_L                        String? @db.VarChar(200)
+model lollipopo {
+  id_origin                     Int     @id @unique
+  Company                       String? @db.VarChar(200)
+  Brand                         String? @db.VarChar(200)
+  Storage_conditions            String? @db.VarChar(200)
+  Reference_FNR_or_product_code String? @db.VarChar(200)
+  EAN_UC                        String? @db.VarChar(200)
+  Denomination_commerciale_UC   String? @db.VarChar(200)
+  Weight_net_kg_ou_L            String? @db.VarChar(200)
 }
 
-model singero{
-  id_origin	                Int   @id @unique
-  Index	                    Int           
-  Article_code	            String? @db.VarChar(500)
-  Product_ID	              String? @db.VarChar(500)
-  Family_ID	                String? @db.VarChar(500)
-  Reference	                String? @db.VarChar(500)
-  Supplier_account          String? @db.VarChar(500)
-  Brand	                    String? @db.VarChar(500)
-  Stock_code	              String? @db.VarChar(500)
-  Brand_reference	          String? @db.VarChar(500)
-  Reference_VP	            String? @db.VarChar(500)
-  EAN_UNITAIRE	            String? @db.VarChar(500)
-  EAN_code	                String? @db.VarChar(500)
-  Designation	              String? @db.VarChar(500)
-  Designation_VP	          String? @db.VarChar(500)
-  NGP	                      String? @db.VarChar(500)
-  Year_of_reference	        String? @db.VarChar(500)
-  inputs                    String? @db.VarChar(500)
+model singero {
+  id_origin         Int     @id @unique
+  Index             Int
+  Article_code      String? @db.VarChar(500)
+  Product_ID        String? @db.VarChar(500)
+  Family_ID         String? @db.VarChar(500)
+  Reference         String? @db.VarChar(500)
+  Supplier_account  String? @db.VarChar(500)
+  Brand             String? @db.VarChar(500)
+  Stock_code        String? @db.VarChar(500)
+  Brand_reference   String? @db.VarChar(500)
+  Reference_VP      String? @db.VarChar(500)
+  EAN_UNITAIRE      String? @db.VarChar(500)
+  EAN_code          String? @db.VarChar(500)
+  Designation       String? @db.VarChar(500)
+  Designation_VP    String? @db.VarChar(500)
+  NGP               String? @db.VarChar(500)
+  Year_of_reference String? @db.VarChar(500)
+  inputs            String? @db.VarChar(500)
 }
-

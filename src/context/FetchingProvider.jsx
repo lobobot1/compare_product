@@ -1,96 +1,44 @@
 "use client";
-import { getSimilar, getTotalSimilar } from "../fetch/getSimilar";
-import { updateSimilar} from "../fetch/updateSimilar";
-import { getOrigin } from "../fetch/getOrigin";
-import { createContext, useState, useEffect, useCallback } from "react";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { updateSimilar } from "../fetch/updateSimilar";
+import { createContext, useState, useEffect } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import useFetch from "../hooks/useFetch";
+import "react-toastify/dist/ReactToastify.css";
+import { useSWRConfig } from "swr";
 
 const FetchingContext = createContext();
 
 const FetchingProvider = ({ children }) => {
-  const [pagination, setPagination] = useState(1);
+  const { cache } = useSWRConfig();
   const [origin, setOrigin] = useState("");
-  const [similar, setSimilar] = useState("");
+  const [pagination, setPagination] = useState(1);
+  const [similar, setSimilar] = useState(null);
   const [similarData, setSimilarData] = useState({});
   const [originData, setOriginData] = useState({});
   const [status, setStatus] = useState();
   const [totalProducts, setTotalProducts] = useState(0);
-  const [message, setMessage] = useState('Product still needs to be matched');
-
-  const getData = async (funct, table, otherOption) => {
-    const currentData = await funct(table, otherOption);
-    if(currentData.ok){
-      let data = await currentData.json();
-      if (table.slice(-1) === "o") {
-        setOriginData(data.data);
-      } else {
-        const currentStatus = data.data.status;
-        setSimilarData(data.data);
-        setStatus(currentStatus);
-        setMessage(currentStatus === 0 ? 'Product still needs to be matched' : currentStatus === 1 ? 'Product Matched' : 'Product not matched');
-      }
-    }
-  };
-
-  const getTotal = useCallback( async () => {
-    if(similar.length > 0){
-      const total = await getTotalSimilar(similar);
-      if(total.ok){
-        let data = await total.json();
-        setTotalProducts(data.data);
-      }
-    }
-  }, [similar])
-
-  const updateStatus = useCallback(async () => {
-     await updateSimilar(similarData.id_similar,status, similar);
-  },[similarData.id_similar, status, similar])
+  const [message, setMessage] = useState("Product still needs to be matched");
 
   useEffect(() => {
-    const storedPagination = window.localStorage.getItem("pagination");
-    const storedOrigin = window.localStorage.getItem("origin");
-    const storedSimilar = window.localStorage.getItem("similar");
-    const storedTotalProducts = window.localStorage.getItem("totalProducts");
-    if (storedPagination && storedOrigin && storedSimilar && storedTotalProducts) {
-      setPagination(parseInt(storedPagination));
-      setOrigin(storedOrigin);
-      setSimilar(storedSimilar);
-      setTotalProducts(parseInt(storedTotalProducts));
+    if(similar===null && cache.get("similar")){
+      setOrigin(cache.get("origin"));
+      setPagination(Number(cache.get("pagination")));
+      setSimilar(cache.get("similar"));
+      setTotalProducts(Number(cache.get("totalProducts")));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    getTotal();
-    setPagination(1);
-  }, [getTotal,origin, similar]);
-  
-  useEffect(() => {
-    if (similar.length > 0) {
-      getData(getSimilar, similar, pagination);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [similar, pagination]);
-
-  useEffect(() => {
-    if (similarData.id_origin) {
-      getData(getOrigin, origin, similarData.id_origin);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [origin, similarData.id_origin]);
-  
-  useEffect(() => {
-    if(similarData.status!==undefined){
-      setStatus(similarData.status);
-    }
-  }, [similarData.status]);
-  
-  useEffect(() => {
-    if(similarData?.status!==undefined && Number.isFinite(status) && similarData.status !== status){
+    if (
+      similarData?.status !== undefined &&
+      Number.isFinite(status) &&
+      similarData.status !== status
+    ) {
       const updateData = async () => {
-        await updateStatus();
+        await updateSimilar(similarData.id_similar, status, similar);
         similarData.status = status;
-      }
+      };
       updateData();
       toast.info(`Status updated to ${status}`, {
         position: "bottom-right",
@@ -101,10 +49,78 @@ const FetchingProvider = ({ children }) => {
         draggable: false,
         progress: undefined,
       });
-      setMessage(status === 0 ? 'Product still needs to be matched' : status === 1 ? 'Product Matched' : 'Product not matched');
+      setMessage(
+        status === 0
+          ? "Product still needs to be matched"
+          : status === 1
+          ? "Product Matched"
+          : "Product not matched"
+      );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status]);
+
+  useEffect(() => {
+    cache.set("pagination", pagination);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pagination]);
+
+  useEffect(() => {
+    cache.set("origin", origin);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [origin]);
+
+  useEffect(() => {
+    cache.set("similar", similar);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [similar]);
+
+  useEffect(() => {
+    cache.set("totalProducts", totalProducts);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [totalProducts]);
+
+  const resSimilar = useFetch(
+    () =>
+      !!similar &&
+      `http://localhost:3000/api/similars?similar=${similar}&pagination=${pagination}`
+  );
+
+  if (
+    !resSimilar.isError &&
+    !resSimilar.isLoading &&
+    !resSimilar.data?.error &&
+    resSimilar.data &&
+    resSimilar.data.data?.id_similar !== similarData.id_similar
+  ) {
+    const { origin, ...rest } = resSimilar.data.data;
+    setSimilarData(rest);
+    setStatus(rest.status);
+    setOriginData(origin)
+    setMessage(
+      resSimilar.data.data.status === 0
+        ? "Product still needs to be matched"
+        : resSimilar.data.data.status === 1
+        ? "Product Matched"
+        : "Product not matched"
+    );
+  }
+
+  const resTotal = useFetch(
+    () =>
+      !!similar && `http://localhost:3000/api/similars/total?similar=${similar}`
+  );
+
+  if (
+    !resTotal.isError &&
+    !resTotal.isLoading &&
+    resTotal.data &&
+    !resTotal.data?.error &&
+    resTotal.data.data !== totalProducts
+  ) 
+    setTotalProducts(resTotal.data.data);
+
+  /* 
 
   useEffect(() => {
     const handleKeyPress = (event) => {
@@ -139,23 +155,10 @@ const FetchingProvider = ({ children }) => {
       document.removeEventListener('keydown', listener);
     }
 
-  },['y','n','p','ArrowLeft','ArrowRight']);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },['y','n','p']);
 
-  useEffect(() => {
-    window.localStorage.setItem("pagination", pagination);
-  }, [pagination]);
-
-  useEffect(() => {
-    window.localStorage.setItem("origin", origin);
-  }, [origin]);
-
-  useEffect(() => {
-    window.localStorage.setItem("similar", similar);
-  }, [similar]);
-
-  useEffect(() => {
-    window.localStorage.setItem("totalProducts", totalProducts);
-  },[totalProducts]);
+   */
 
   return (
     <FetchingContext.Provider
@@ -170,8 +173,8 @@ const FetchingProvider = ({ children }) => {
         originData,
         status,
         setStatus,
-        totalProducts,  
-        message
+        totalProducts,
+        message,
       }}
     >
       {children}
