@@ -7,6 +7,45 @@ interface params {
   similarID: number;
 }
 
+const dictionaryOrigin = {
+  nikeo: {
+    Brand: true,
+    Description: true,
+    Color: true,
+    Gender: true,
+    Size: true,
+  },
+  giottoo: {
+    BRAND: true,
+    DESIGNATION: true,
+  },
+  lollipopo: {
+    Brand: true,
+    Denomination_commerciale_UC: true,
+    Weight_net_kg_ou_L: true,
+  },
+  ljacquardo: {
+    Brand: true,
+    Type_of_product: true,
+    Color: true,
+    Dimensions: true,
+  },
+  singero: {
+    Brand: true,
+    Reference: true,
+    Designation: true,
+  },
+  maisono: {
+    Brand_to_integrate: true,
+    Designation: true,
+    Area: true,
+    Appellation: true,
+    Color: true,
+    Capacity_volume: true,
+    Vintage_year: true,
+  },
+};
+
 const dictionarySimilar = {
   nikes: {
     Brand: true,
@@ -26,6 +65,8 @@ const dictionarySimilar = {
   },
 };
 
+
+
 export async function GET(req: NextRequest): Promise<NextResponse> {
   const similar = req.nextUrl.searchParams.get("similar");
 
@@ -42,36 +83,13 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
   if(!await prisma[similar])
     return NextResponse.json({ error: "Similar not found" }, { status: 404 });
 
+  value[similar.slice(0, -1)+'o'] = {
+    select: dictionaryOrigin[similar.slice(0, -1)+'o'],
+  }
+
   const [similarData] = await prisma[similar].findMany({
-    where: {
-      OR:[
-        {
-          AND:[
-            {
-              status: {
-                gt: 0,
-              }
-            },
-            {
-              updated_at: {
-                gte: new Date(new Date().getDate()-1)
-              }
-            }
-          ]
-        },
-        {
-          AND:[
-            {
-              status: 0
-            },
-            {
-              updated_at: {
-                gte: new Date()
-              }
-            }
-          ]
-        }
-      ]
+    where:{
+      status: 0
     },
     skip: pagination - 1,
     take: 1,
@@ -81,6 +99,8 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
   if (!similarData)
     return NextResponse.json({ error: "Similar not found" }, { status: 404 });
 
+  similarData.origin = similarData[similar.slice(0, -1)+'o']
+  delete similarData[similar.slice(0, -1)+'o']
   return NextResponse.json(
     {
       data: similarData,
